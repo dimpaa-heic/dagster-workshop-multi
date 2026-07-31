@@ -1,6 +1,6 @@
 Hourly weather forecast pipeline for three Indonesian cities (Jakarta, Bandung, Surabaya), pulled from the free Open-Meteo API. I picked weather data because it's a public API with no key required, updates frequently (good fit for a scheduled Dagster job), and has a clear physical sanity check I could build an `@asset_check` around.
 
-Built on top of [dagster-workshop-multi](https://github.com/<original-org>/dagster-workshop-multi), a multi-container Dagster workshop — see that repo's README for the base architecture (`pipeline_products`, `pipeline_fx`, `pipeline_ml`).
+Built on top of [dagster-workshop-multi](https://github.com/<original-org>/dagster-workshop-multi), a multi-container Dagster workshop see that repo's README for the base architecture (`pipeline_products`, `pipeline_fx`, `pipeline_ml`).
 
 ## What I built
 
@@ -60,4 +60,4 @@ Open http://localhost:3000, find `pipeline_weather` under Deployment > Code Loca
 
 ## What I'd do differently in production
 
-The truncate-and-load pattern means every run wipes and replaces the whole `weather` table — fine for a workshop, but in production I'd want an append-only history table so I could actually analyze trends over time instead of only ever seeing the latest snapshot. I'd also add retry logic around the Open-Meteo request (right now a single timeout just fails the run), move the warehouse credentials into a real secrets manager instead of plain environment variables, and add alerting on asset check failures so a bad reading gets flagged before anyone notices the dashboard looks wrong.
+The truncate-and-load pattern means every run wipes and replaces the whole `weather` table fine for a workshop, but in production I'd want an append-only history table so I could actually analyze trends over time instead of only ever seeing the latest snapshot. I'd also add retry logic around the Open-Meteo request (right now a single timeout just fails the run), move the warehouse credentials into a real secrets manager instead of plain environment variables, and add alerting on asset check failures so a bad reading gets flagged before anyone notices the dashboard looks wrong.
