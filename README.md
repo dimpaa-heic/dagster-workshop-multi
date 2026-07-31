@@ -1,6 +1,6 @@
 Hourly weather forecast pipeline for three Indonesian cities (Jakarta, Bandung, Surabaya), pulled from the free Open-Meteo API. I picked weather data because it's a public API with no key required, updates frequently (good fit for a scheduled Dagster job), and has a clear physical sanity check I could build an `@asset_check` around.
 
-Built on top of [dagster-workshop-multi](https://github.com/<original-org>/dagster-workshop-multi), a multi-container Dagster workshop see that repo's README for the base architecture (`pipeline_products`, `pipeline_fx`, `pipeline_ml`).
+Built on top of [dagster-workshop-multi](https://github.com/<original-org>/dagster-workshop-multi), a multi-container Dagster workshop — see that repo's README for the base architecture (`pipeline_products`, `pipeline_fx`, `pipeline_ml`).
 
 ## What I built
 
@@ -40,6 +40,17 @@ docker compose up --build
 
 Open http://localhost:3000, find `pipeline_weather` under Deployment > Code Locations, and materialize its assets (`raw_weather`, `weather_table`).
 
+## Screenshots needed
+
+To evidence this pipeline, the following screenshots were captured from the Dagster UI at `http://localhost:3000` (after `docker compose up --build` and materializing all assets) and from a local terminal run of `pytest`:
+
+| # | Screenshot | Why it's needed |
+|---|---|---|
+| 1 | Assets tab — asset lineage graph (`raw_weather` → `weather_table`), both showing green / "Materialized" | Proves the whole pipeline ran successfully end to end. |
+| 2 | Asset detail page for `raw_weather`, "Checks" tab showing `temperature_within_plausible_range` as Passed | Proves the asset check is registered and passing, not just present in the code. |
+| 3 | Deployment > Code Locations, showing `pipeline_weather` with status Loaded | Proves `pipeline_weather` runs as its own independent code location/container. |
+| 4 | Terminal output of `pytest -q` showing "8 passed" | Proves the code is correct independent of the UI/Docker environment. |
+
 ## Demo
 
 **Asset lineage** — `raw_weather` → `weather_table`, both materialized, with the `temperature_within_plausible_range` check passing (✓ 1):
@@ -56,8 +67,12 @@ Open http://localhost:3000, find `pipeline_weather` under Deployment > Code Loca
 
 **Code location detail** — `pipeline_weather` running as its own gRPC server on port 4003:
 
-![pipeline_weather code location detail](docs/images/04_code_location_detail.png)
+![pipeline_weather code location detail](docs/images/05_code_location_detail.png)
+
+**pytest run** — 8 tests passing locally, independent of Docker and the Dagster UI:
+
+![pytest 8 passed](docs/images/07_pytest_passed.png)
 
 ## What I'd do differently in production
 
-The truncate-and-load pattern means every run wipes and replaces the whole `weather` table fine for a workshop, but in production I'd want an append-only history table so I could actually analyze trends over time instead of only ever seeing the latest snapshot. I'd also add retry logic around the Open-Meteo request (right now a single timeout just fails the run), move the warehouse credentials into a real secrets manager instead of plain environment variables, and add alerting on asset check failures so a bad reading gets flagged before anyone notices the dashboard looks wrong.
+The truncate-and-load pattern means every run wipes and replaces the whole `weather` table — fine for a workshop, but in production I'd want an append-only history table so I could actually analyze trends over time instead of only ever seeing the latest snapshot. I'd also add retry logic around the Open-Meteo request (right now a single timeout just fails the run), move the warehouse credentials into a real secrets manager instead of plain environment variables, and add alerting on asset check failures so a bad reading gets flagged before anyone notices the dashboard looks wrong.
