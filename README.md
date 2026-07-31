@@ -67,11 +67,11 @@ To evidence this pipeline, the following screenshots were captured from the Dags
 
 **Code location detail** — `pipeline_weather` running as its own gRPC server on port 4003:
 
-![pipeline_weather code location detail](docs/images/05_code_location_detail.png)
+![pipeline_weather code location detail](docs/images/04_code_location_detail.png)
 
 **pytest run** — 8 tests passing locally, independent of Docker and the Dagster UI:
 
-![pytest 8 passed](docs/images/07_pytest_passed.png)
+![pytest 8 passed](docs/images/05_pytest_passed.png)
 
 ## What I'd do differently in production
 
